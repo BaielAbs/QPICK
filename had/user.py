@@ -10,7 +10,7 @@ Order = "https://6a2fe782a7f8866418d53f42.mockapi.io/Orders"
 
 main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Info)")],
+        [KeyboardButton(text="Info")],
         [KeyboardButton(text="Orders")],
     ],
     resize_keyboard=True
@@ -23,6 +23,10 @@ async def start(message: Message):
 @router.message(F.text == "Orders")
 async def orders(message: Message):
     await message.answer("Введите номер заказа")
+
+@router.message(F.text=="Info")
+async def info(message: Message):
+    await message.answer("📱 Добро пожаловать!\n Этот бот создан для магазина техники QPICK.\n \n С помощью бота вы можете:\n • Просматривать свой товар\n • Узнавать характеристики устройств\n \n 🌐 Наш сайт: ВАША_ССЫЛКА_ЗДЕСЬ\n \n Спасибо, что выбрали нас!\n")
 
 
 @router.message()

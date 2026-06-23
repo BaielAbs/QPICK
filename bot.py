@@ -7,7 +7,7 @@ from had.user import router
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-TOKEN = "8811617979:AAHdX3Kfm42RY-nhp0vwKTGEYhggFDIbNcE"
+TOKEN = "8991682437:AAEgOnKJ_QoZs9JjVbxSjzpO37wESqvTdic"
 
 async def main():
     bot = Bot(token=TOKEN)
