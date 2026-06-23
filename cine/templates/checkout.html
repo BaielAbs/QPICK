@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа — QPICK</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#eaeaea] font-sans text-[#1c1c1c] min-h-screen flex flex-col justify-between">
+
+    <header class="max-w-[1110px] w-full mx-auto px-4 py-4 flex items-center justify-between sticky top-0 bg-[#eaeaea]/90 backdrop-blur-md z-50">
+        <div class="flex items-center gap-12">
+            <a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a>
+
+            <div class="hidden sm:flex items-center gap-2 text-sm font-semibold text-neutral-500 cursor-pointer hover:text-neutral-900 transition">
+                <img src="{% static 'img/Vector (15).png' %}" alt="Телефон" class="w-4 h-4 object-contain">
+                <span>Выбрать модель телефона</span>
+                <span class="text-[10px]">▼</span>
+            </div>
+        </div>
+
+        <div></div>
+    </header>
+
+    <main class="max-w-[1110px] w-full mx-auto px-4 flex-grow my-6">
+        <h1 class="text-xl font-semibold text-neutral-700 mb-6 tracking-wide">Оформление заказа</h1>
+
+        <form method="POST" action="." class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {% csrf_token %}
+
+            <div class="lg:col-span-2 space-y-6">
+
+                <div class="bg-white rounded-3xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-neutral-800 text-base">Доставка курьером</h2>
+                        <span class="font-bold text-[#dfa84b] text-sm">300 KGZ</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1.5">Адрес доставки</label>
+                            <input type="text" name="city" placeholder="Город" required
+                                   class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition">
+                        </div>
+
+                        <div>
+                            <input type="text" name="street" placeholder="Улица / Район" required
+                                   class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition">
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <input type="text" name="house" placeholder="Дом" required
+                                   class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition">
+                            <input type="text" name="entrance" placeholder="Подъезд"
+                                   class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition">
+                            <input type="text" name="apartment" placeholder="Квартира"
+                                   class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 shadow-sm">
+                    <h2 class="font-bold text-neutral-800 text-base mb-3">Способ оплаты</h2>
+                    <div class="relative">
+                        <select name="payment_method" required
+                                class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition appearance-none cursor-pointer font-medium text-neutral-800">
+                            <option value="cash">💵 Наличными при получении</option>
+                            <option value="online">💳 Онлайн-оплата (MBank / О!Деньги / Карта)</option>
+                        </select>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-neutral-400">▼</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 shadow-sm">
+                    <label class="block font-bold text-neutral-800 text-base mb-3">Номер получателя</label>
+                        <div class="relative">
+                            <input type="tel" name="phone" value="+996 " required
+                             oninput="if (this.value.length === 1 && this.value !== '+') { this.value = '+996 ' + this.value; }"
+                             class="w-full bg-neutral-100 text-sm py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#dfa84b] focus:bg-white transition font-medium tracking-wide">
+                        </div>
+                </div>
+
+            </div>
+
+            <div class="space-y-4">
+
+                <div class="bg-white rounded-3xl p-6 shadow-sm space-y-4">
+                    <h2 class="font-bold text-neutral-800 text-base">Ваш заказ</h2>
+
+                    <div class="max-h-60 overflow-y-auto space-y-3 pr-1 no-scrollbar">
+                        {% for item in cart_items %}
+                            <div class="flex justify-between items-start text-sm gap-2">
+                                <span class="text-neutral-500 font-medium">
+                                    {{ item.quantity }}x <span class="text-neutral-800">{{ item.product.title }}</span>
+                                </span>
+                                <span class="font-semibold text-neutral-800 whitespace-nowrap">{{ item.total_price }} KGZ</span>
+                            </div>
+                        {% empty %}
+                            <div class="text-sm text-neutral-400 text-center py-2">В корзине пусто</div>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="border-neutral-100">
+
+                    <div class="space-y-2 text-sm font-medium">
+                        <div class="flex justify-between text-neutral-500">
+                            <span>Доставка</span>
+                            <span class="text-neutral-800">300 KGZ</span>
+                        </div>
+                        <div class="flex justify-between text-base font-bold pt-2">
+                            <span class="text-neutral-800">К оплате</span>
+                            <span class="text-[#dfa84b]">{{ final_price|default:"0" }} KGZ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm py-4 rounded-2xl shadow-md transition active:scale-98 cursor-pointer text-center block">
+                    Закончить оформление
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <footer class="bg-white rounded-t-3xl shadow-inner pt-8 pb-6 mt-12">
+        <div class="max-w-[1110px] w-full mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-start">
+            <div><a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a></div>
+            <div class="flex flex-col gap-3 text-sm font-medium text-neutral-800">
+                <a href="{% url 'tehno_fav' %}" class="hover:text-[#dfa84b] transition">Избранное</a>
+                <a href="{% url 'tehno_basket' %}" class="hover:text-[#dfa84b] transition">Корзина</a>
+                <a href="#" class="hover:text-[#dfa84b] transition">Контакты</a>
+            </div>
+            <div class="flex flex-col gap-4">
+                <a href="#" class="text-sm font-medium text-neutral-800 hover:text-[#dfa84b] transition">Условия сервиса</a>
+                <div class="flex items-center gap-3 text-xs font-semibold">
+                    <img src="{% static 'img/RU.png' %}" alt="Язык" class="w-4 h-4 object-contain">
+                    <button type="button" class="text-neutral-400 hover:text-neutral-900 transition">Кр</button>
+                    <button type="button" class="text-[#dfa84b] font-bold">Рус</button>
+                    <button type="button" class="text-neutral-400 hover:text-neutral-900 transition">Eng</button>
+                </div>
+            </div>
+            <div class="flex gap-4 sm:justify-end">
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/VK.png' %}" alt="VK" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Instagram.png' %}" alt="Instagram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Telegram.png' %}" alt="Telegram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Whatsapp.png' %}" alt="WhatsApp" class="w-6 h-6 object-contain"></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

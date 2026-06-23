@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить товар — QPICK</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#eaeaea] font-sans text-[#1c1c1c] min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-lg">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-neutral-900">Новый товар</h1>
+            <a href="{% url 'index' %}" class="text-xs font-medium text-neutral-400 hover:text-neutral-900 transition">Отмена</a>
+        </div>
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Название товара</label>
+                <input type="text" name="title" required placeholder="Например: AirPods Pro 2"
+                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-neutral-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Цена (KGZ)</label>
+                <input type="number" name="price" required placeholder="4500"
+                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-neutral-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Категория</label>
+                <select name="category" required
+                        class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-neutral-400 transition">
+                    <option value="phone">Телефон</option>
+                    <option value="headphones" selected>Наушники</option>
+                    <option value="cases">Чехлы</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Рейтинг (от 1 до 5)</label>
+                <input type="number" name="ratting" min="1" max="5" placeholder="5" value="5"
+                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-neutral-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Ссылка на изображение (URL)</label>
+                <input type="url" name="image_url" placeholder="https://example.com/image.png"
+                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-neutral-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Описание</label>
+                <textarea name="description" rows="4" placeholder="Опишите ключевые особенности аксессуара..."
+                          class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-neutral-400 transition resize-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-[#dfa84b] hover:bg-[#c9933b] text-white font-semibold text-sm py-3 rounded-xl transition shadow-sm mt-2 active:scale-98 cursor-pointer">
+                Создать товар
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

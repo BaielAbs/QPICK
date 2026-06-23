@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QPICK — Магазин аксессуаров</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#eaeaea] font-sans text-[#1c1c1c] min-h-screen flex flex-col justify-between">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (!currentUser) {
+                window.location.href = "{% url 'tehno_start' %}";
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const userParam = urlParams.get('user');
+
+            if (userParam !== currentUser.Username) {
+                window.location.href = window.location.pathname + "?user=" + currentUser.Username;
+            }
+
+            updateCartBadge();
+        });
+    </script>
+
+    <script>
+    function toggleFavorite(event, productId, button) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        fetch(`/fav/toggle/${productId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const heart = button.querySelector("svg");
+
+                if (data.is_favorite) {
+                    heart.classList.add("text-red-500", "fill-current");
+                    heart.classList.remove("text-neutral-400");
+                } else {
+                    heart.classList.remove("text-red-500", "fill-current");
+                    heart.classList.add("text-neutral-400");
+                }
+
+                const favBadge = document.getElementById("fav-badge");
+                if (favBadge) favBadge.innerText = data.count;
+            });
+    }
+    </script>
+
+    <header class="max-w-[1110px] w-full mx-auto px-4 py-4 flex items-center justify-between sticky top-0 bg-[#eaeaea]/90 backdrop-blur-md z-50">
+        <a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a>
+
+        <div class="flex items-center gap-6">
+            <a href="{% url 'tehno_profile' %}" class="text-sm font-semibold text-neutral-700 hover:text-neutral-900 flex items-center gap-1 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                Профиль
+            </a>
+
+            <a href="{% url 'tehno_fav' %}" class="relative p-1 text-neutral-600 hover:text-neutral-900 transition">
+                <img src="{% static 'img/Vector (13).png' %}" alt="Избранное" class="w-5 h-5">
+                <span id="fav-badge" class="absolute -top-1.5 -right-1.5 bg-[#dfa84b] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">0</span>
+            </a>
+
+            <a href="{% url 'tehno_basket' %}" class="relative p-1 text-neutral-600 hover:text-neutral-900 transition group">
+                <img src="{% static 'img/Vector (14).png' %}" alt="Корзина" class="w-5 h-5 group-hover:scale-105 transition">
+                <span id="cartCounter" class="absolute -top-1.5 -right-1.5 bg-[#dfa84b] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm transition-all duration-300 scale-100">0</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-[1110px] w-full mx-auto px-4 flex-grow mb-16">
+
+        <div class="relative bg-[#101010] text-white rounded-[30px] overflow-hidden max-w-[1110px] w-full mx-auto h-[180px] sm:h-[200px] flex items-center mb-6 shadow-sm">
+            <div class="pl-8 sm:pl-16 z-10 select-none">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-medium tracking-wide leading-tight text-white">
+                    Store<br>
+                    <span class="font-semibold">iPhone</span>
+                </h1>
+            </div>
+            <div class="absolute right-0 top-3 h-full w-1/2 flex justify-end items-center pointer-events-none select-none">
+                <img src="{% static 'img/iPhone-13-Pro-Max-silver-1000x1000 1 (1).png' %}" alt="iPhone 13 Pro Max" class="h-[120%] w-auto object-contain object-right transform -translate-y-3 pr-4 sm:pr-12 md:pr-16 transition duration-500 hover:scale-105">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-sm mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <form method="GET" action="" class="w-full md:w-1/2 relative">
+                <input type="hidden" name="user" value="{{ request.GET.user }}">
+                {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+
+                <input type="text" name="search" placeholder="Поиск товаров..." value="{{ request.GET.search }}" class="w-full bg-[#eaeaea] pl-4 pr-10 py-2.5 rounded-xl text-sm border-none outline-none focus:ring-2 focus:ring-neutral-400 transition">
+                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </form>
+
+            <div class="w-full md:w-auto flex items-center gap-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Категория:</label>
+                <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+                    <a href="?user={{ request.GET.user }}" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if not request.GET.category %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Все</a>
+                    <a href="?user={{ request.GET.user }}&category=phone" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'phone' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Телефон</a>
+                    <a href="?user={{ request.GET.user }}&category=headphones" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'headphones' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Наушники</a>
+                    <a href="?user={{ request.GET.user }}&category=cases" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'cases' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Чехлы</a>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-lg font-semibold text-neutral-500 tracking-wide">Товары</h2>
+                <a href="{% url 'tehno_create' %}" class="bg-[#dfa84b] hover:bg-[#c9933b] text-white font-medium text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5 active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Добавить
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {% for product in products %}
+                    <div onclick="window.location.href='{% url 'tehno_detail' product.id %}'" class="bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between relative group min-h-[420px] cursor-pointer">
+
+                        <button onclick="toggleFavorite(event, {{ product.id }}, this)" class="absolute top-5 left-5 z-20 cursor-pointer">
+                            <svg class="w-5 h-5 {% if product.id|stringformat:'s' in fav %} text-red-500 fill-current {% else %} text-neutral-400 {% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+
+                        <div class="w-full h-48 flex items-center justify-center my-4 overflow-hidden">
+                            {% if product.image_url %}
+                                <img src="{{ product.image_url }}" alt="{{ product.title }}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300">
+                            {% else %}
+                                <img src="{% static 'img/headphones_placeholder.png' %}" alt="Placeholder" class="max-h-full max-w-full object-contain">
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="font-semibold text-neutral-800 text-base max-w-[70%] leading-tight">{{ product.title }}</h3>
+                                <div class="text-right">
+                                    <span class="block text-[#dfa84b] font-semibold text-sm whitespace-nowrap">{{ product.price }} KGZ</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-2 border-t border-neutral-100 mb-4">
+                                <div class="flex items-center gap-1 text-sm font-medium text-neutral-500">
+                                    <svg class="w-4 h-4 text-[#dfa84b] fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    <span>{{ product.ratting|default:"5" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                            <a href="{% url 'cart_add' product.id %}" onclick="event.stopPropagation()" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium text-xs py-2.5 rounded-xl transition text-center z-20 block cursor-pointer">
+                            В корзину
+                            </a>
+                                <a href="{% url 'tehno_edit' product.id %}" onclick="event.stopPropagation()" class="bg-neutral-800 hover:bg-neutral-900 text-white font-medium text-xs py-2.5 rounded-xl transition text-center active:scale-95 z-20">
+                                    Изменить
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-span-full bg-white rounded-3xl p-12 flex flex-col items-center justify-center text-center shadow-sm border border-dashed border-neutral-300">
+                        <svg class="w-16 h-16 text-neutral-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <p class="text-lg font-medium text-neutral-500">Нет товаров</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white rounded-t-3xl shadow-inner pt-8 pb-6">
+        <div class="max-w-[1110px] w-full mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-start">
+            <div><a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a></div>
+            <div class="flex flex-col gap-3 text-sm font-medium text-neutral-800">
+                <a href="{% url 'tehno_fav' %}" class="hover:text-[#dfa84b] transition">Избранное</a>
+                <a href="{% url 'tehno_basket' %}" class="hover:text-[#dfa84b] transition">Корзина</a>
+                <a href="#" class="hover:text-[#dfa84b] transition">Контакты</a>
+            </div>
+            <div class="flex flex-col gap-4">
+                <a href="#" class="text-sm font-medium text-neutral-800 hover:text-[#dfa84b] transition">Условия сервиса</a>
+                <div class="flex items-center gap-3 text-xs font-semibold">
+                    <img src="{% static 'img/RU.png' %}" alt="Язык" class="w-4 h-4 object-contain">
+                    <button class="text-neutral-400 hover:text-neutral-900 transition">Кр</button>
+                    <button class="text-[#dfa84b] font-bold">Рус</button>
+                    <button class="text-neutral-400 hover:text-neutral-900 transition">Eng</button>
+                </div>
+            </div>
+            <div class="flex gap-4 sm:justify-end">
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/VK.png' %}" alt="VK" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Instagram.png' %}" alt="Instagram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Telegram.png' %}" alt="Telegram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Whatsapp.png' %}" alt="WhatsApp" class="w-6 h-6 object-contain"></a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        function updateCartBadge() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) return;
+
+            const cartKey = `cart_${currentUser.Username}`;
+            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            const badge = document.getElementById('cartCounter');
+            if (badge) {
+                badge.innerText = totalItems;
+            }
+        }
+
+        function addToCart(id, title, price, imageUrl) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (!currentUser) {
+                alert('Пожалуйста, войдите, чтобы добавлять товары.');
+                window.location.href = "{% url 'tehno_login' %}";
+                return;
+            }
+
+            const cartKey = `cart_${currentUser.Username}`;
+            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            const existingItem = cart.find(item => item.id === id);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: id,
+                    title: title,
+                    price: parseInt(price),
+                    image: imageUrl,
+                    quantity: 1
+                });
+            }
+
+            localStorage.setItem(cartKey, JSON.stringify(cart));
+            updateCartBadge();
+
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Добавлено! ✓";
+            btn.classList.add("bg-neutral-900", "text-white");
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove("bg-neutral-900", "text-white");
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

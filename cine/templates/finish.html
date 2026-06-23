@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказ оформлен — QPICK</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#eaeaea] font-sans text-[#1c1c1c] min-h-screen flex flex-col justify-between">
+
+    <header class="max-w-[1110px] w-full mx-auto px-4 py-4 flex items-center justify-between sticky top-0 bg-[#eaeaea]/90 backdrop-blur-md z-50">
+        <a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a>
+        <div></div>
+    </header>
+
+    <main class="max-w-[1110px] w-full mx-auto px-4 flex-grow flex items-center justify-center my-6">
+
+        <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-sm text-center max-w-3xl w-full mx-auto">
+            <h1 class="text-lg sm:text-xl font-bold text-neutral-800">
+                Номер вашего заказа №{{ order_number }}, с Вами свяжется наш телеграм бот.
+            </h1>
+
+            <a href="{% url 'index' %}" class="inline-block mt-8 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-semibold text-sm py-3 px-8 rounded-xl transition active:scale-95">
+                Вернуться на главную
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="bg-white rounded-t-3xl shadow-inner pt-8 pb-6 mt-12">
+        <div class="max-w-[1110px] w-full mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-start">
+            <div><a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a></div>
+            <div class="flex flex-col gap-3 text-sm font-medium text-neutral-800">
+                <a href="{% url 'tehno_fav' %}" class="hover:text-[#dfa84b] transition">Избранное</a>
+                <a href="#" class="hover:text-[#dfa84b] transition">Контакты</a>
+            </div>
+            <div class="flex flex-col gap-4">
+                <a href="#" class="text-sm font-medium text-neutral-800 hover:text-[#dfa84b] transition">Условия сервиса</a>
+                <div class="flex items-center gap-3 text-xs font-semibold">
+                    <img src="{% static 'img/RU.png' %}" alt="Язык" class="w-4 h-4 object-contain">
+                    <button type="button" class="text-neutral-400 hover:text-neutral-900 transition">Кр</button>
+                    <button type="button" class="text-[#dfa84b] font-bold">Рус</button>
+                    <button type="button" class="text-neutral-400 hover:text-neutral-900 transition">Eng</button>
+                </div>
+            </div>
+            <div class="flex gap-4 sm:justify-end">
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/VK.png' %}" alt="VK" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Instagram.png' %}" alt="Instagram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Telegram.png' %}" alt="Telegram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Whatsapp.png' %}" alt="WhatsApp" class="w-6 h-6 object-contain"></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

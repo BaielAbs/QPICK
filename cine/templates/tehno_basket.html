@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина — QPICK</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-[#eaeaea] font-sans text-[#1c1c1c] min-h-screen flex flex-col justify-between">
+
+    <header class="max-w-[1110px] w-full mx-auto px-4 py-4 flex items-center justify-between sticky top-0 bg-[#eaeaea]/90 backdrop-blur-md z-50">
+        <a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a>
+
+        <div class="flex items-center gap-6">
+            <a href="#" class="relative p-1 hover:scale-105 transition">
+                <img src="{% static 'img/Vector (13).png' %}" alt="Избранное" class="w-6 h-6 object-contain">
+                <span class="absolute -top-1 -right-1 bg-[#dfa84b] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </a>
+            <a href="{% url 'tehno_basket' %}" class="relative p-1 hover:scale-105 transition">
+                <img src="{% static 'img/Vector (14).png' %}" alt="Корзина" class="w-6 h-6 object-contain">
+                <span class="absolute -top-1 -right-1 bg-[#dfa84b] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {{ cart_count|default:0 }}
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-[1110px] w-full mx-auto px-4 flex-grow flex flex-col my-6">
+
+        {% if not cart_items %}
+            <div class="flex-grow flex flex-col items-center justify-center text-center py-12">
+                <div class="relative mb-6 text-neutral-300">
+                    <svg class="w-40 h-40 mx-auto stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                    </svg>
+                    <div class="absolute bottom-4 right-8 w-4 h-4 bg-amber-400 rounded-full animate-ping"></div>
+                </div>
+
+                <h1 class="text-2xl font-bold text-neutral-800 mb-2">Корзина пуста</h1>
+                <p class="text-neutral-500 text-sm mb-8">Но это никогда не поздно исправить :)</p>
+
+                <a href="{% url 'index' %}" class="bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-sm py-3.5 px-10 rounded-2xl shadow-md transition active:scale-95">
+                    В каталог товаров
+                </a>
+            </div>
+
+        {% else %}
+            <h1 class="text-xl font-semibold text-neutral-700 mb-6 tracking-wide">Корзина</h1>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+                <div class="lg:col-span-2 space-y-4">
+                    {% for item in cart_items %}
+                        <div class="bg-white rounded-3xl p-5 shadow-sm flex items-center justify-between gap-4 relative group">
+
+                            <div class="flex items-center gap-4">
+                                <div class="w-24 h-24 bg-neutral-50 rounded-2xl flex items-center justify-center p-2 overflow-hidden border border-neutral-100">
+                                    {% if item.product.image_url %}
+                                        <img src="{{ item.product.image_url }}" alt="{{ item.product.title }}" class="max-h-full max-w-full object-contain">
+                                    {% else %}
+                                        <img src="{% static 'img/headphones_placeholder.png' %}" alt="Placeholder" class="max-h-full max-w-full object-contain">
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <h3 class="font-semibold text-neutral-800 text-base leading-tight mb-1">{{ item.product.title }}</h3>
+                                    <span class="text-xs text-neutral-400 block mb-2">{{ item.product.price }} KGZ / шт.</span>
+
+                                    <div class="flex items-center gap-3 bg-neutral-100 w-max rounded-xl p-1">
+                                        <a href="{% url 'cart_remove' item.product.id %}" class="w-7 h-7 bg-white rounded-lg flex items-center justify-center font-bold text-neutral-600 hover:bg-neutral-200 transition text-sm select-none">-</a>
+                                        <span class="text-sm font-semibold px-1 text-neutral-800">{{ item.quantity }}</span>
+                                        <a href="{% url 'cart_add' item.product.id %}" class="w-7 h-7 bg-white rounded-lg flex items-center justify-center font-bold text-neutral-600 hover:bg-neutral-200 transition text-sm select-none">+</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-end justify-between h-24 py-1">
+                                <a href="{% url 'cart_delete_item' item.product.id %}" class="text-neutral-300 hover:text-red-500 transition" title="Удалить из корзины">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </a>
+                                <span class="font-bold text-neutral-900 text-base whitespace-nowrap">{{ item.item_total }} KGZ</span>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 shadow-sm sticky top-24">
+                    <h2 class="text-lg font-bold text-neutral-800 mb-4 tracking-wide uppercase text-xs text-neutral-400">Ваш заказ</h2>
+                    <div class="flex justify-between items-center mb-6 border-b border-neutral-100 pb-4">
+                        <span class="text-sm font-medium text-neutral-500">ИТОГО</span>
+                        <span class="text-xl font-bold text-neutral-900">{{ total_price }} KGZ</span>
+                    </div>
+                    <a href="{% url 'tehno_checkout' %}" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-sm py-4 rounded-2xl shadow-md transition text-center block cursor-pointer active:scale-98">
+                        Перейти к оформлению
+                    </a>
+
+                    <a href="{% url 'index' %}" class="block text-center text-xs font-semibold text-[#dfa84b] hover:underline mt-4">
+                        Продолжить покупки
+                    </a>
+                </div>
+
+            </div>
+        {% endif %}
+
+    </main>
+
+    <footer class="bg-white rounded-t-3xl shadow-inner pt-8 pb-6 mt-12">
+        <div class="max-w-[1110px] w-full mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-start">
+            <div><a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a></div>
+            <div class="flex flex-col gap-3 text-sm font-medium text-neutral-800">
+                <a href="#" class="hover:text-[#dfa84b] transition">Избранное</a>
+                <a href="{% url 'tehno_basket' %}" class="hover:text-[#dfa84b] transition">Корзина</a>
+                <a href="#" class="hover:text-[#dfa84b] transition">Контакты</a>
+            </div>
+            <div class="flex flex-col gap-4">
+                <a href="#" class="text-sm font-medium text-neutral-800 hover:text-[#dfa84b] transition">Условия сервиса</a>
+                <div class="flex items-center gap-3 text-xs font-semibold">
+                    <img src="{% static 'img/RU.png' %}" alt="Язык" class="w-4 h-4 object-contain">
+                    <button class="text-neutral-400 hover:text-neutral-900 transition">Кр</button>
+                    <button class="text-[#dfa84b] font-bold">Рус</button>
+                    <button class="text-neutral-400 hover:text-neutral-900 transition">Eng</button>
+                </div>
+            </div>
+            <div class="flex gap-4 sm:justify-end">
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/VK.png' %}" alt="VK" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Instagram.png' %}" alt="Instagram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Telegram.png' %}" alt="Telegram" class="w-6 h-6 object-contain"></a>
+                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Whatsapp.png' %}" alt="WhatsApp" class="w-6 h-6 object-contain"></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
