@@ -29,6 +29,9 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
+## Сайт
+<img width="1915" height="953" alt="image" src="https://github.com/user-attachments/assets/efa85f65-e7dc-4168-8139-66a6a889ccc7" />
+
 
 ## О проекте
 
