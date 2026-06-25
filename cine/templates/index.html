@@ -1,212 +1,258 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QPICK — Магазин аксессуаров</title>
+    <title>QPICK — Премиум магазин аксессуаров</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbfbfd; /* Apple background */
+        }
+
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
 </head>
-<body class="bg-[#eaeaea] font-sans text-[#1c1c1c] min-h-screen flex flex-col justify-between">
+<body class="text-[#1d1d1f] min-h-screen flex flex-col justify-between selection:bg-[#dfa84b] selection:text-white">
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
             if (!currentUser) {
                 window.location.href = "{% url 'tehno_start' %}";
                 return;
             }
-
             const urlParams = new URLSearchParams(window.location.search);
             const userParam = urlParams.get('user');
-
             if (userParam !== currentUser.Username) {
                 window.location.href = window.location.pathname + "?user=" + currentUser.Username;
             }
-
             updateCartBadge();
         });
+
+        function toggleFavorite(event, productId, button) {
+            event.preventDefault();
+            event.stopPropagation();
+            fetch(`/fav/toggle/${productId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const heart = button.querySelector("svg");
+                    if (data.is_favorite) {
+                        heart.classList.add("text-red-500", "fill-current", "drop-shadow-md");
+                        heart.classList.remove("text-neutral-300");
+                        heart.classList.add("scale-125");
+                        setTimeout(() => heart.classList.remove("scale-125"), 300);
+                    } else {
+                        heart.classList.remove("text-red-500", "fill-current", "drop-shadow-md");
+                        heart.classList.add("text-neutral-300");
+                    }
+                    const favBadge = document.getElementById("fav-badge");
+                    if (favBadge) favBadge.innerText = data.count;
+                });
+        }
     </script>
 
-    <script>
-    function toggleFavorite(event, productId, button) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        fetch(`/fav/toggle/${productId}/`)
-            .then(response => response.json())
-            .then(data => {
-                const heart = button.querySelector("svg");
-
-                if (data.is_favorite) {
-                    heart.classList.add("text-red-500", "fill-current");
-                    heart.classList.remove("text-neutral-400");
-                } else {
-                    heart.classList.remove("text-red-500", "fill-current");
-                    heart.classList.add("text-neutral-400");
-                }
-
-                const favBadge = document.getElementById("fav-badge");
-                if (favBadge) favBadge.innerText = data.count;
-            });
-    }
-    </script>
-
-    <header class="max-w-[1110px] w-full mx-auto px-4 py-4 flex items-center justify-between sticky top-0 bg-[#eaeaea]/90 backdrop-blur-md z-50">
-        <a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a>
-
-        <div class="flex items-center gap-6">
-            <a href="{% url 'tehno_profile' %}" class="text-sm font-semibold text-neutral-700 hover:text-neutral-900 flex items-center gap-1 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-                Профиль
+    <header class="w-full sticky top-0 z-50 bg-white/50 backdrop-blur-2xl border-b border-gray-200/50 transition-all duration-300">
+        <div class="max-w-[1140px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+            <a href="/" class="text-3xl font-extrabold tracking-tighter text-black hover:opacity-70 transition-opacity">
+                QPICK<span class="text-[#dfa84b]">.</span>
             </a>
 
-            <a href="{% url 'tehno_fav' %}" class="relative p-1 text-neutral-600 hover:text-neutral-900 transition">
-                <img src="{% static 'img/Vector (13).png' %}" alt="Избранное" class="w-5 h-5">
-                <span id="fav-badge" class="absolute -top-1.5 -right-1.5 bg-[#dfa84b] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm">0</span>
-            </a>
+            <div class="flex items-center gap-6 sm:gap-8">
+                <a href="{% url 'tehno_profile' %}" class="hidden sm:flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black transition-colors duration-300">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                    Профиль
+                </a>
 
-            <a href="{% url 'tehno_basket' %}" class="relative p-1 text-neutral-600 hover:text-neutral-900 transition group">
-                <img src="{% static 'img/Vector (14).png' %}" alt="Корзина" class="w-5 h-5 group-hover:scale-105 transition">
-                <span id="cartCounter" class="absolute -top-1.5 -right-1.5 bg-[#dfa84b] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-sm transition-all duration-300 scale-100">0</span>
-            </a>
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'tehno_fav' %}" class="relative p-2 text-gray-400 hover:text-black transition-colors duration-300 group">
+                        <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300 ease-out" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <span id="fav-badge" class="absolute top-0 right-0 bg-[#dfa84b] text-white text-[10px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow-[0_2px_8px_rgba(223,168,75,0.6)] border-2 border-white">0</span>
+                    </a>
+
+                    <a href="{% url 'tehno_basket' %}" class="relative p-2 text-gray-400 hover:text-black transition-colors duration-300 group">
+                        <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300 ease-out" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span id="cartCounter" class="absolute top-0 right-0 bg-black text-white text-[10px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.4)] border-2 border-white">0</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-[1110px] w-full mx-auto px-4 flex-grow mb-16">
+    <main class="max-w-[1140px] w-full mx-auto px-4 sm:px-6 flex-grow pb-24 mt-8">
 
-        <div class="relative bg-[#101010] text-white rounded-[30px] overflow-hidden max-w-[1110px] w-full mx-auto h-[180px] sm:h-[200px] flex items-center mb-6 shadow-sm">
-            <div class="pl-8 sm:pl-16 z-10 select-none">
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-medium tracking-wide leading-tight text-white">
-                    Store<br>
-                    <span class="font-semibold">iPhone</span>
+        <div class="relative bg-black rounded-[40px] overflow-hidden w-full h-[260px] sm:h-[320px] flex items-center mb-12 shadow-[0_20px_50px_rgba(0,0,0,0.15)] group">
+
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#dfa84b] rounded-full mix-blend-screen filter blur-[120px] opacity-30 group-hover:opacity-50 transition-opacity duration-1000"></div>
+
+            <div class="pl-8 sm:pl-20 z-10 select-none relative">
+                <span class="block text-[#dfa84b] font-semibold tracking-widest text-xs sm:text-sm uppercase mb-3">Новая коллекция</span>
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white">
+                    Идеально для<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-500 font-extrabold">Вашего iPhone</span>
                 </h1>
             </div>
-            <div class="absolute right-0 top-3 h-full w-1/2 flex justify-end items-center pointer-events-none select-none">
-                <img src="{% static 'img/iPhone-13-Pro-Max-silver-1000x1000 1 (1).png' %}" alt="iPhone 13 Pro Max" class="h-[120%] w-auto object-contain object-right transform -translate-y-3 pr-4 sm:pr-12 md:pr-16 transition duration-500 hover:scale-105">
+            <div class="absolute -right-10 top-0 h-full w-2/3 flex justify-end items-center pointer-events-none select-none">
+                <img src="{% static 'img/iPhone-13-Pro-Max-silver-1000x1000 1 (1).png' %}" alt="iPhone" class="h-[140%] sm:h-[160%] w-auto object-contain object-right transform animate-float drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)]">
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 shadow-sm mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <form method="GET" action="" class="w-full md:w-1/2 relative">
+        <div class="flex flex-col xl:flex-row gap-6 justify-between items-center mb-10 sticky top-[80px] z-40 bg-[#fbfbfd]/80 backdrop-blur-xl py-4 border-b border-gray-200/50 xl:border-none">
+
+            <form method="GET" action="" class="w-full xl:w-[35%] relative group">
                 <input type="hidden" name="user" value="{{ request.GET.user }}">
                 {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
 
-                <input type="text" name="search" placeholder="Поиск товаров..." value="{{ request.GET.search }}" class="w-full bg-[#eaeaea] pl-4 pr-10 py-2.5 rounded-xl text-sm border-none outline-none focus:ring-2 focus:ring-neutral-400 transition">
-                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" name="search" placeholder="Найти идеальный чехол..." value="{{ request.GET.search }}" class="w-full bg-white pl-6 pr-14 py-3.5 rounded-full text-sm font-medium border border-gray-200 shadow-sm focus:border-[#dfa84b] focus:ring-4 focus:ring-[#dfa84b]/10 transition-all outline-none text-gray-800 placeholder-gray-400">
+                <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gray-50 rounded-full text-gray-400 group-hover:text-[#dfa84b] group-hover:bg-[#dfa84b]/10 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </button>
             </form>
 
-            <div class="w-full md:w-auto flex items-center gap-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Категория:</label>
-                <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-    <a href="?user={{ request.GET.user }}" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if not request.GET.category %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Все</a>
+            <div class="w-full xl:w-auto overflow-hidden relative">
+                <div class="flex gap-2.5 overflow-x-auto hide-scroll w-full pb-1">
+                    {% with current_cat=request.GET.category %}
+                    <a href="?user={{ request.GET.user }}" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap {% if not current_cat %} bg-black text-white shadow-[0_8px_15px_rgba(0,0,0,0.2)] {% else %} bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-black {% endif %}">Все</a>
 
-    <a href="?user={{ request.GET.user }}&category=phone" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'phone' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Телефон</a>
+                    <a href="?user={{ request.GET.user }}&category=phone" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap {% if current_cat == 'phone' %} bg-black text-white shadow-[0_8px_15px_rgba(0,0,0,0.2)] {% else %} bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-black {% endif %}">Телефоны</a>
 
-    <a href="?user={{ request.GET.user }}&category=headphones" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'headphones' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Наушники</a>
+                    <a href="?user={{ request.GET.user }}&category=headphones" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap {% if current_cat == 'headphones' %} bg-black text-white shadow-[0_8px_15px_rgba(0,0,0,0.2)] {% else %} bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-black {% endif %}">Наушники</a>
 
-    <a href="?user={{ request.GET.user }}&category=cases" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'cases' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Чехлы</a>
+                    <a href="?user={{ request.GET.user }}&category=cases" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap {% if current_cat == 'cases' %} bg-black text-white shadow-[0_8px_15px_rgba(0,0,0,0.2)] {% else %} bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-black {% endif %}">Чехлы</a>
 
-    <a href="?user={{ request.GET.user }}&category=laptop" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'laptop' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Ноутбуки</a>
+                    <a href="?user={{ request.GET.user }}&category=laptop" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap {% if current_cat == 'laptop' %} bg-black text-white shadow-[0_8px_15px_rgba(0,0,0,0.2)] {% else %} bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-black {% endif %}">MacBook</a>
 
-    <a href="?user={{ request.GET.user }}&category=watch" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'watch' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Часы</a>
-
-    <a href="?user={{ request.GET.user }}&category=tablet" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'tablet' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Планшеты</a>
-</div>
+                    <a href="?user={{ request.GET.user }}&category=watch" class="px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap {% if current_cat == 'watch' %} bg-black text-white shadow-[0_8px_15px_rgba(0,0,0,0.2)] {% else %} bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-black {% endif %}">Часы</a>
+                    {% endwith %}
+                </div>
             </div>
         </div>
 
         <section>
-            <div class="flex justify-between items-center mb-5">
-                <h2 class="text-lg font-semibold text-neutral-500 tracking-wide">Товары</h2>
-
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {% for product in products %}
-                    <div onclick="window.location.href='{% url 'tehno_detail' product.id %}'" class="bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between relative group min-h-[420px] cursor-pointer">
+                    <div onclick="window.location.href='{% url 'tehno_detail' product.id %}'" class="bg-white rounded-[32px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between relative group cursor-pointer animate-fade-up {% cycle 'delay-1' 'delay-2' 'delay-3' 'delay-1' %}">
 
-                        <button onclick="toggleFavorite(event, {{ product.id }}, this)" class="absolute top-5 left-5 z-20 cursor-pointer">
-                            <svg class="w-5 h-5 {% if product.id|stringformat:'s' in fav %} text-red-500 fill-current {% else %} text-neutral-400 {% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="toggleFavorite(event, {{ product.id }}, this)" class="absolute top-5 left-5 z-20 cursor-pointer p-2.5 bg-white/70 backdrop-blur-md rounded-full shadow-sm border border-gray-100 hover:scale-110 active:scale-90 transition-all duration-300">
+                            <svg class="w-5 h-5 transition-colors duration-300 {% if product.id|stringformat:'s' in fav %} text-red-500 fill-current drop-shadow-md {% else %} text-gray-300 {% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                             </svg>
                         </button>
 
-                        <div class="w-full h-48 flex items-center justify-center my-4 overflow-hidden">
+                        <div class="w-full h-56 flex items-center justify-center mb-6 mt-2 relative">
+
+                            <div class="absolute bottom-0 w-3/4 h-4 bg-black/5 blur-xl rounded-[100%]"></div>
+
                             {% if product.image_url %}
-                                <img src="{{ product.image_url }}" alt="{{ product.title }}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300">
+                                <img src="{{ product.image_url }}" alt="{{ product.title }}" class="max-h-full max-w-full object-contain group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700 ease-out z-10 drop-shadow-sm">
                             {% else %}
-                                <img src="{% static 'img/headphones_placeholder.png' %}" alt="Placeholder" class="max-h-full max-w-full object-contain">
+                                <img src="{% static 'img/headphones_placeholder.png' %}" alt="Placeholder" class="max-h-full max-w-full object-contain opacity-30 z-10">
                             {% endif %}
                         </div>
 
                         <div class="mt-auto">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-neutral-800 text-base max-w-[70%] leading-tight">{{ product.title }}</h3>
-                                <div class="text-right">
-                                    <span class="block text-[#dfa84b] font-semibold text-sm whitespace-nowrap">{{ product.price }} KGZ</span>
-                                </div>
-                            </div>
+                            <h3 class="font-bold text-gray-900 text-lg leading-tight mb-3 line-clamp-2">{{ product.title }}</h3>
 
-                            <div class="flex justify-between items-center pt-2 border-t border-neutral-100 mb-4">
-                                <div class="flex items-center gap-1 text-sm font-medium text-neutral-500">
+                            <div class="flex justify-between items-end mb-6">
+                                <div class="flex items-center gap-1.5 text-sm font-bold text-gray-700 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-xl">
                                     <svg class="w-4 h-4 text-[#dfa84b] fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    <span>{{ product.ratting|default:"5" }}</span>
+                                    <span>{{ product.ratting|default:"5.0" }}</span>
+                                </div>
+                                <div class="text-right flex flex-col items-end">
+                                    <span class="block text-2xl font-extrabold text-black tracking-tight">{{ product.price }}<span class="text-sm font-bold text-gray-400 ml-1">KGZ</span></span>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 gap-2">
-    <a href="{% url 'cart_add' product.id %}"
-       onclick="event.stopPropagation()"
-       class="flex items-center justify-center gap-2 bg-neutral-800 hover:bg-black text-white font-medium text-sm py-2.5 rounded-xl transition-all duration-200 active:scale-95 z-20 cursor-pointer">
-        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-        В корзину
-    </a>
-</div>
+                            <a href="{% url 'cart_add' product.id %}"
+                               onclick="event.stopPropagation()"
+                               class="w-full flex items-center justify-center gap-2 bg-black hover:bg-[#dfa84b] text-white font-bold text-sm py-4 rounded-full transition-all duration-300 active:scale-[0.97] z-20 cursor-pointer shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_25px_rgba(223,168,75,0.4)]">
+                                В корзину
+                            </a>
                         </div>
                     </div>
                 {% empty %}
-                    <div class="col-span-full bg-white rounded-3xl p-12 flex flex-col items-center justify-center text-center shadow-sm border border-dashed border-neutral-300">
-                        <svg class="w-16 h-16 text-neutral-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        <p class="text-lg font-medium text-neutral-500">Нет товаров</p>
+                    <div class="col-span-full bg-white rounded-[40px] p-20 flex flex-col items-center justify-center text-center shadow-sm border border-dashed border-gray-200 animate-fade-up">
+                        <div class="bg-gray-50 p-6 rounded-full mb-6">
+                            <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-black mb-3">Ничего не найдено</h3>
+                        <p class="text-base text-gray-500 max-w-md">Мы не смогли найти товары по вашему запросу. Попробуйте выбрать другую категорию или изменить условия поиска.</p>
+                        <a href="?user={{ request.GET.user }}" class="mt-8 px-8 py-3.5 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition-colors">Сбросить фильтры</a>
                     </div>
                 {% endfor %}
             </div>
         </section>
     </main>
 
-    <footer class="bg-white rounded-t-3xl shadow-inner pt-8 pb-6">
-        <div class="max-w-[1110px] w-full mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-start">
-            <div><a href="/" class="text-2xl font-bold tracking-wide text-neutral-900">QPICK</a></div>
-            <div class="flex flex-col gap-3 text-sm font-medium text-neutral-800">
-                <a href="{% url 'tehno_fav' %}" class="hover:text-[#dfa84b] transition">Избранное</a>
-                <a href="{% url 'tehno_basket' %}" class="hover:text-[#dfa84b] transition">Корзина</a>
-                <a href="#" class="hover:text-[#dfa84b] transition">Контакты</a>
+    <footer class="bg-white border-t border-gray-100 pt-16 pb-12 mt-auto rounded-t-[48px] shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+        <div class="max-w-[1140px] w-full mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+
+            <div class="md:col-span-4">
+                <a href="/" class="text-3xl font-extrabold tracking-tighter text-black">
+                    QPICK<span class="text-[#dfa84b]">.</span>
+                </a>
+                <p class="text-sm text-gray-500 mt-4 leading-relaxed font-medium pr-8">
+                    Мы предлагаем только лучшие и проверенные аксессуары для ваших устройств. Премиальное качество в каждой детали.
+                </p>
             </div>
-            <div class="flex flex-col gap-4">
-                <a href="#" class="text-sm font-medium text-neutral-800 hover:text-[#dfa84b] transition">Условия сервиса</a>
-                <div class="flex items-center gap-3 text-xs font-semibold">
-                    <img src="{% static 'img/RU.png' %}" alt="Язык" class="w-4 h-4 object-contain">
-                    <button class="text-neutral-400 hover:text-neutral-900 transition">Кр</button>
-                    <button class="text-[#dfa84b] font-bold">Рус</button>
-                    <button class="text-neutral-400 hover:text-neutral-900 transition">Eng</button>
+
+            <div class="md:col-span-3 flex flex-col gap-4 text-sm font-bold text-gray-600">
+                <a href="{% url 'tehno_fav' %}" class="hover:text-black hover:translate-x-1 transition-all duration-300 w-fit">Избранное</a>
+                <a href="{% url 'tehno_basket' %}" class="hover:text-black hover:translate-x-1 transition-all duration-300 w-fit">Корзина оформления</a>
+                <a href="#" class="hover:text-black hover:translate-x-1 transition-all duration-300 w-fit">Контакты</a>
+            </div>
+
+            <div class="md:col-span-3 flex flex-col gap-6">
+                <a href="#" class="text-sm font-bold text-gray-600 hover:text-black transition-colors">Условия сервиса</a>
+                <div class="flex items-center gap-1 bg-gray-50 p-1.5 rounded-full w-fit border border-gray-100">
+                    <img src="{% static 'img/RU.png' %}" alt="Язык" class="w-6 h-6 object-cover rounded-full shadow-sm ml-1">
+                    <div class="flex items-center px-2 text-xs font-bold gap-3">
+                        <button class="text-gray-400 hover:text-black transition-colors">Кр</button>
+                        <button class="text-black bg-white px-3 py-1.5 rounded-full shadow-sm">Рус</button>
+                        <button class="text-gray-400 hover:text-black transition-colors">Eng</button>
+                    </div>
                 </div>
             </div>
-            <div class="flex gap-4 sm:justify-end">
-                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/VK.png' %}" alt="VK" class="w-6 h-6 object-contain"></a>
-                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Instagram.png' %}" alt="Instagram" class="w-6 h-6 object-contain"></a>
-                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Telegram.png' %}" alt="Telegram" class="w-6 h-6 object-contain"></a>
-                <a href="#" class="hover:opacity-80 transition"><img src="{% static 'img/Whatsapp.png' %}" alt="WhatsApp" class="w-6 h-6 object-contain"></a>
+
+            <div class="md:col-span-2 flex gap-3 sm:justify-end items-start">
+                <a href="#" class="bg-gray-50 p-3 rounded-full hover:bg-[#dfa84b] hover:-translate-y-1 transition-all duration-300 group border border-gray-100">
+                    <img src="{% static 'img/VK.png' %}" alt="VK" class="w-5 h-5 object-contain opacity-60 group-hover:opacity-100 group-hover:brightness-0 group-hover:invert transition-all">
+                </a>
+                <a href="#" class="bg-gray-50 p-3 rounded-full hover:bg-[#dfa84b] hover:-translate-y-1 transition-all duration-300 group border border-gray-100">
+                    <img src="{% static 'img/Instagram.png' %}" alt="Instagram" class="w-5 h-5 object-contain opacity-60 group-hover:opacity-100 group-hover:brightness-0 group-hover:invert transition-all">
+                </a>
+                <a href="#" class="bg-gray-50 p-3 rounded-full hover:bg-[#dfa84b] hover:-translate-y-1 transition-all duration-300 group border border-gray-100">
+                    <img src="{% static 'img/Telegram.png' %}" alt="Telegram" class="w-5 h-5 object-contain opacity-60 group-hover:opacity-100 group-hover:brightness-0 group-hover:invert transition-all">
+                </a>
             </div>
         </div>
+        <div class="max-w-[1140px] w-full mx-auto px-4 sm:px-6 mt-12 pt-8 border-t border-gray-100 text-center sm:text-left text-xs font-semibold text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© 2026 QPICK. Все права защищены.</p>
+            <p>Designed with passion.</p>
+        </div>
     </footer>
+
     <script>
         function updateCartBadge() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -219,45 +265,13 @@
             const badge = document.getElementById('cartCounter');
             if (badge) {
                 badge.innerText = totalItems;
+                badge.classList.add("scale-125", "bg-[#dfa84b]", "text-white");
+                badge.classList.remove("bg-black");
+                setTimeout(() => {
+                    badge.classList.remove("scale-125", "bg-[#dfa84b]");
+                    badge.classList.add("bg-black");
+                }, 300);
             }
-        }
-
-        function addToCart(id, title, price, imageUrl) {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-            if (!currentUser) {
-                alert('Пожалуйста, войдите, чтобы добавлять товары.');
-                window.location.href = "{% url 'tehno_login' %}";
-                return;
-            }
-
-            const cartKey = `cart_${currentUser.Username}`;
-            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
-            const existingItem = cart.find(item => item.id === id);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({
-                    id: id,
-                    title: title,
-                    price: parseInt(price),
-                    image: imageUrl,
-                    quantity: 1
-                });
-            }
-
-            localStorage.setItem(cartKey, JSON.stringify(cart));
-            updateCartBadge();
-
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Добавлено! ✓";
-            btn.classList.add("bg-neutral-900", "text-white");
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.remove("bg-neutral-900", "text-white");
-            }, 1000);
         }
     </script>
 </body>
