@@ -104,11 +104,20 @@
             <div class="w-full md:w-auto flex items-center gap-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Категория:</label>
                 <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-                    <a href="?user={{ request.GET.user }}" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if not request.GET.category %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Все</a>
-                    <a href="?user={{ request.GET.user }}&category=phone" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'phone' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Телефон</a>
-                    <a href="?user={{ request.GET.user }}&category=headphones" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'headphones' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Наушники</a>
-                    <a href="?user={{ request.GET.user }}&category=cases" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'cases' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Чехлы</a>
-                </div>
+    <a href="?user={{ request.GET.user }}" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if not request.GET.category %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Все</a>
+
+    <a href="?user={{ request.GET.user }}&category=phone" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'phone' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Телефон</a>
+
+    <a href="?user={{ request.GET.user }}&category=headphones" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'headphones' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Наушники</a>
+
+    <a href="?user={{ request.GET.user }}&category=cases" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'cases' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Чехлы</a>
+
+    <a href="?user={{ request.GET.user }}&category=laptop" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'laptop' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Ноутбуки</a>
+
+    <a href="?user={{ request.GET.user }}&category=watch" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'watch' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Часы</a>
+
+    <a href="?user={{ request.GET.user }}&category=tablet" class="px-4 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap {% if request.GET.category == 'tablet' %} bg-neutral-900 text-white {% else %} bg-[#eaeaea] text-neutral-800 hover:bg-neutral-900 hover:text-white {% endif %}">Планшеты</a>
+</div>
             </div>
         </div>
 
@@ -154,14 +163,16 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2">
-                            <a href="{% url 'cart_add' product.id %}" onclick="event.stopPropagation()" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-medium text-xs py-2.5 rounded-xl transition text-center z-20 block cursor-pointer">
-                            В корзину
-                            </a>
-                                <a href="{% url 'tehno_edit' product.id %}" onclick="event.stopPropagation()" class="bg-neutral-800 hover:bg-neutral-900 text-white font-medium text-xs py-2.5 rounded-xl transition text-center active:scale-95 z-20">
-                                    Изменить
-                                </a>
-                            </div>
+                            <div class="grid grid-cols-1 gap-2">
+    <a href="{% url 'cart_add' product.id %}"
+       onclick="event.stopPropagation()"
+       class="flex items-center justify-center gap-2 bg-neutral-800 hover:bg-black text-white font-medium text-sm py-2.5 rounded-xl transition-all duration-200 active:scale-95 z-20 cursor-pointer">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        В корзину
+    </a>
+</div>
                         </div>
                     </div>
                 {% empty %}
